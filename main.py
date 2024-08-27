@@ -22,3 +22,11 @@ def ln_likelihood(theta, x, y, dy):
     y_model = model(theta, x)
     return -0.5 * np.sum(np.log(2 * np.pi * dy ** 2) + (y - y_model) ** 2 / dy ** 2)
 
+def ln_prior(theta):
+    if np.all(np.abs(theta[1]) < 100):
+        return 0
+    return -np.inf
+
+def ln_posterior(theta, x, y, dy):
+    return ln_prior(theta) + ln_likelihood(theta, x, y, dy) 
+
