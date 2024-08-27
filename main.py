@@ -60,7 +60,7 @@ fig, ax = plt.subplots(2)
 ax[0].plot(chain[:, 0])
 ax[1].plot(chain[:, 1])
 
-# Now that we've burned-in, let's get a fresh chain
+#Fresh chain
 chain, n_accept = run_mcmc(ln_posterior, 500000, ndim, chain[-1], 0.1, args)
 
 fig, ax = plt.subplots(2)
