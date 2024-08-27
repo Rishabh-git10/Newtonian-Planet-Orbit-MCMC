@@ -13,3 +13,12 @@ def make_data(intercept, slope, N=20, dy=2, rseed=42):
 theta_true = [2, 0.5]
 x, y, dy = make_data(theta_true[0], theta_true[1])
 
+plt.errorbar(x, y, dy, fmt='o')
+
+def model(theta, x):
+    return theta[0] + theta[1] * x
+
+def ln_likelihood(theta, x, y, dy):
+    y_model = model(theta, x)
+    return -0.5 * np.sum(np.log(2 * np.pi * dy ** 2) + (y - y_model) ** 2 / dy ** 2)
+
