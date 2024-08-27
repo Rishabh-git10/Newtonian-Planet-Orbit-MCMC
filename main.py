@@ -1,6 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy.stats as stats
+from scipy import stats
+
+# use seaborn plotting defaults
+# If this causes an error, you can comment it out.
 import seaborn; seaborn.set()
 
 def make_data(intercept, slope, N=20, dy=2, rseed=42):
@@ -28,5 +31,44 @@ def ln_prior(theta):
     return -np.inf
 
 def ln_posterior(theta, x, y, dy):
-    return ln_prior(theta) + ln_likelihood(theta, x, y, dy) 
+    return ln_prior(theta) + ln_likelihood(theta, x, y, dy)
 
+def run_mcmc(ln_posterior, nsteps, ndim, theta0, stepsize, args=()):
+    chain = np.zeros((nsteps, ndim))
+    chain[0] = theta0
+    log_prob = ln_posterior(theta0, *args)
+    n_accept = 0
+    for i in range(1, nsteps):
+        theta_new = chain[i - 1] + stepsize * np.random.randn(ndim)
+        log_prob_new = ln_posterior(theta_new, *args)
+        if (log_prob_new - log_prob) > np.log(np.random.rand()):
+            chain[i] = theta_new
+            log_prob = log_prob_new
+            n_accept += 1
+        else:
+            chain[i] = chain[i - 1]
+    return chain, n_accept
+
+ndim = 2
+nsteps = 10000
+theta0 = [1, 0]
+stepsize = 0.1
+args = (x, y, dy)
+chain, n_accept = run_mcmc(ln_posterior, nsteps, ndim, theta0, stepsize, args)
+
+fig, ax = plt.subplots(2)
+ax[0].plot(chain[:, 0])
+ax[1].plot(chain[:, 1])
+
+# Now that we've burned-in, let's get a fresh chain
+chain, n_accept = run_mcmc(ln_posterior, 500000, ndim, chain[-1], 0.1, args)
+
+fig, ax = plt.subplots(2)
+ax[0].plot(chain[:, 0])
+ax[1].plot(chain[:, 1])
+
+fig, ax = plt.subplots(2)
+ax[0].hist(chain[:, 0], bins=250, alpha=0.5, density=True)
+ax[1].hist(chain[:, 1], bins=250, alpha=0.5, density=True)
+
+plt.show()
