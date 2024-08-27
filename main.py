@@ -1,10 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import stats
-
-# use seaborn plotting defaults
-# If this causes an error, you can comment it out.
-import seaborn; seaborn.set()
+import seaborn; seaborn.set_theme()
 
 def make_data(intercept, slope, N=20, dy=2, rseed=42):
     rand = np.random.RandomState(rseed)
